@@ -39,20 +39,25 @@
                 e.preventDefault();
                 var username = $('.input_txt').val();
                 var password = $('.input_pass').val();
-                $.post({
-                    url: "http://localhost:8000/admin/login",
-                    data: {
-                        'user_name': username,
-                        'password': password,
-                    },
-                    success: function (backData) {
-                        if (backData.code == 200) {
-                            location.href = './index.html'
-                        } else {
-                            alert(backData.msg)
+                if (username == '' || password == '') {
+                    alert('用户名或者密码为空')
+                } else {
+                    $.post({
+                        url: "http://localhost:8000/admin/login",
+                        data: {
+                            'user_name': username,
+                            'password': password,
+                        },
+                        success: function (backData) {
+                            if (backData.code == 200) {
+                                location.href = './index.html'
+                            } else {
+                                alert(backData.msg)
+                            }
                         }
-                    }
-                })
+                    })
+                }
+
             })
         })
     </script>

@@ -127,7 +127,14 @@
             })
 
             // 页面一进来 就要更改个人信息
-             
+            $.get({
+                url: "http://localhost:8000/admin/getuser",
+                success: function (backData) {
+                    $('.user_info').children('img').attr('src', backData.data.user_pic);
+                    $('.user_info').children('span').html('欢迎&nbsp;&nbsp' + backData.data.nickname);
+                    $('.user_center_link').children('img').attr('src', backData.data.user_pic)
+                }
+            })
         })
     </script>
 

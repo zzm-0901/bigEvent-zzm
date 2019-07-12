@@ -29,8 +29,33 @@
             </form>
         </div>
 
-    </div> 
-
+    </div>
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script>
+        // 入口函数
+        $(function () {
+            // 给登录添加点击事件
+            $('.input_sub').click(function (e) {
+                e.preventDefault();
+                var username = $('.input_txt').val();
+                var password = $('.input_pass').val();
+                $.post({
+                    url: "http://localhost:8000/admin/login",
+                    data: {
+                        'user_name': username,
+                        'password': password,
+                    },
+                    success: function (backData) {
+                        if (backData.code == 200) {
+                            location.href = './index.html'
+                        } else {
+                            alert(backData.msg)
+                        }
+                    }
+                })
+            })
+        })
+    </script>
 </body>
 
 </html>

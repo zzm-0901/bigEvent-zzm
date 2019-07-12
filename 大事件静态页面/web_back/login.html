@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/iconfont.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="./js/bootstrap/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -28,9 +29,25 @@
                 <input type="submit" class="input_sub" value="登 录">
             </form>
         </div>
+    </div>
 
+    <!-- 弹框 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">温馨提示!!!</h4>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+            </div>
+        </div>
     </div>
     <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
     <script>
         // 入口函数
         $(function () {
@@ -40,7 +57,10 @@
                 var username = $('.input_txt').val();
                 var password = $('.input_pass').val();
                 if (username == '' || password == '') {
-                    alert('用户名或者密码为空')
+                    $('.modal-body').text('账号或者密码为空')
+                    $('#myModal').modal({
+                        keyboard: true
+                    })
                 } else {
                     $.post({
                         url: "http://localhost:8000/admin/login",
@@ -52,7 +72,10 @@
                             if (backData.code == 200) {
                                 location.href = './index.html'
                             } else {
-                                alert(backData.msg)
+                                $('.modal-body').text('账号或者密码为输入有误')
+                                $('#myModal').modal({
+                                    keyboard: true
+                                })
                             }
                         }
                     })

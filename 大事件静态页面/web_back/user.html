@@ -22,24 +22,24 @@
         <div class="container-fluid common_con">
             <form class="form-horizontal article_form">
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">用户名称：</label>
+                    <label for="inputEmail3" class="col-sm-2 control-label ">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="李思思">
+                        <input type="text" class="form-control username" id="inputEmail3" value="李思思">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">昵称：</label>
+                    <label for="inputEmail3" class="col-sm-2 control-label ">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="思思">
+                        <input type="text" class="form-control nickname" id="inputEmail3" value="思思">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
+                    <label for="inputEmail3" class="col-sm-2 control-label ">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="lisisi@126.com">
+                        <input type="text" class="form-control email" id="inputEmail3" value="lisisi@126.com">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
@@ -49,13 +49,13 @@
                 </div>
 
                 <div class="form-group">
-                        <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
-                        <div class="col-sm-4">
-                            <input type="password" class="form-control" id="inputEmail3" value="12345678">
-                        </div>
+                    <label for="inputEmail3" class="col-sm-2 control-label ">密码：</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control password" id="inputEmail3" value="12345678">
                     </div>
-               
-    
+                </div>
+
+
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button type="submit" class="btn btn-success">修改</button>
@@ -65,6 +65,20 @@
         </div>
     </div>
 
+    <script>
+        $(function () {
+            $.get({
+                url: "http://localhost:8000/admin/userinfo_get",
+                success: function (result) {
+                    $('.username').val(result.data.username);
+                    $('.nickname').val(result.data.nickname);
+                    $('.email').val(result.data.email);
+                    $('.password').val(result.data.password);
+                    $('.user_pic').attr('src', result.data.user_pic)
+                }
+            })
+        })
+    </script>
 </body>
 
 </html>

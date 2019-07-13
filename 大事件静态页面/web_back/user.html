@@ -70,11 +70,13 @@
             $.get({
                 url: "http://localhost:8000/admin/userinfo_get",
                 success: function (result) {
-                    $('.username').val(result.data.username);
-                    $('.nickname').val(result.data.nickname);
-                    $('.email').val(result.data.email);
-                    $('.password').val(result.data.password);
-                    $('.user_pic').attr('src', result.data.user_pic)
+                    if (result.code == 200) {
+                        $('.username').val(result.data.username);
+                        $('.nickname').val(result.data.nickname);
+                        $('.email').val(result.data.email);
+                        $('.password').val(result.data.password);
+                        $('.user_pic').attr('src', result.data.user_pic)
+                    }
                 }
             })
         })

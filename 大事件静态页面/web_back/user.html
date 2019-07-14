@@ -97,9 +97,16 @@
                     data: fm,
                     contentType: false,
                     processData: false,
-                    success: function (res) {
-                        if (res.code == 200) {
+                    success: function (backData) {
+                        console.log(backData);
+                        
+                        if (backData.code == 200) {
 
+                            parent.$('.user_info').children('img').attr('src', backData.data.user_pic);
+                            parent.$('.user_info').children('span').html('欢迎&nbsp;&nbsp' + backData.data.nickname);
+                            parent.$('.user_center_link').children('img').attr('src', backData.data.user_pic)
+                            // location.reload()
+                            
                         }
                     }
                 })

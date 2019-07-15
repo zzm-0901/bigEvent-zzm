@@ -89,6 +89,7 @@
                 </div>
                 <div class="modal-body">
                     <form>
+                        <input type="text" class="id">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
                             <input type="text" class="form-control sys-name" id="recipient-name">
@@ -141,7 +142,7 @@
             <td class="text-center">
                 <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
                         class="btn btn-info btn-xs">编辑</a>
-                <a href="javascript:deleteTr( 3 );" class="btn btn-danger btn-xs">删除</a>
+                <a href="#" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-del">删除</a>
              </td>
         </tr>
         {{/each}}
@@ -155,21 +156,23 @@
             <td class="text-center">
                 <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
                         class="btn btn-info btn-xs">编辑</a>
-                <a href="javascript:deleteTr( 3 );" class="btn btn-danger btn-xs">删除</a>
+                <a href="#" data-id="{{id}}" class="btn btn-danger btn-xs btn-del">删除</a>
              </td>
         </tr>
     </script>
     <script>
         $(function () {
             // 进来文章管理  更新页面数据
-            $.get({
-                url: "http://localhost:8000/admin/category_search",
-                success: function (backData) {
-                    var str = template('tpl-1', backData);
-                    $('tbody').html(str)
-                }
-            });
-
+            function getArt() {
+                $.get({
+                    url: "http://localhost:8000/admin/category_search",
+                    success: function (backData) {
+                        var str = template('tpl-1', backData);
+                        $('tbody').html(str)
+                    }
+                });
+            }
+            getArt();
             // 给点击新增添加点击事件
             $('#model_add').click(function () {
                 // e.preventDefault()
@@ -188,18 +191,37 @@
                         if (backData.code == 200) {
                             var obj = {
                                 name: sysName,
-                                slug: nickname
+                                slug: nickname,
                             }
                             var str1 = template('tpl-2', obj);
                             $('tbody').append(str1);
                             // window.location.onload();
-                        }
 
+                        }
                     }
                 });
                 $('#addModal').modal('hide');
             })
-            // $('#addModal').modal('hide');
+
+            $('tbody').on('click', '.btn-del', function (e) {
+                var idcate = $('.btn-del').attr('data-id')
+                var that = this;
+                e.preventDefault();
+                if (confirm('你是否要删除')) {
+                    $.post({
+                        url: "http://localhost:8000/admin/category_delete",
+                        data: {
+                            id: idcate
+                        },
+                        success: function (backData) {
+                            console.log(backData);
+                            if (backData.code == 200) {
+                                $(that).parent().parent().remove();
+                            }
+                        }
+                    })
+                }
+            })
         })
     </script>
 

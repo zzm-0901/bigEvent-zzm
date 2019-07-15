@@ -72,7 +72,8 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" class="btn btn-success btn-add" data-toggle="modal"
+                                data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
@@ -89,7 +90,7 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <input type="text" class="id">
+                        <input type="hidden" class="id">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
                             <input type="text" class="form-control sys-name" id="recipient-name">
@@ -126,8 +127,8 @@
 
         $('.category_table').delegate('a', 'click', function () {
             if ($(this).hasClass('btn-info')) {
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
+
+
             }
         })      
     </script>
@@ -140,8 +141,7 @@
             <td>{{$value.name}}</td>
             <td>{{$value.slug}}</td>
             <td class="text-center">
-                <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
-                        class="btn btn-info btn-xs">编辑</a>
+                <a href="#" data-id="{{$value.id}}" class="btn btn-info btn-xs btn-edit">编辑</a>
                 <a href="#" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-del">删除</a>
              </td>
         </tr>
@@ -149,7 +149,7 @@
     </script>
 
     <!-- 准备新增的模板 -->
-    <script id="tpl-2" type="text/html">
+    <!-- <script id="tpl-2" type="text/html">
         <tr>
             <td>{{name}}</td>
             <td>{{slug}}</td>
@@ -159,7 +159,7 @@
                 <a href="#" data-id="{{id}}" class="btn btn-danger btn-xs btn-del">删除</a>
              </td>
         </tr>
-    </script>
+    </script> -->
     <script>
         $(function () {
             // 进来文章管理  更新页面数据
@@ -173,38 +173,98 @@
                 });
             }
             getArt();
-            // 给点击新增添加点击事件
-            $('#model_add').click(function () {
-                // e.preventDefault()
-                // 分类名称
-                var sysName = $('.sys-name').val();
-                // 分类别名
-                var nickname = $('.nickname').val();
-                // 发送请求
-                $.post({
-                    url: "http://localhost:8000/admin/category_add",
-                    data: {
-                        name: sysName,
-                        slug: nickname
-                    },
-                    success: function (backData) {
-                        if (backData.code == 200) {
-                            var obj = {
-                                name: sysName,
-                                slug: nickname,
-                            }
-                            var str1 = template('tpl-2', obj);
-                            $('tbody').append(str1);
-                            // window.location.onload();
 
-                        }
-                    }
-                });
-                $('#addModal').modal('hide');
+            // 给每一个编辑添加点击事件
+            // 并且点击哪一个 表单里就有哪一个元素的名字和昵称
+            $('tbody').on('click', '.btn-edit', function (e) {
+                e.preventDefault();
+                var nickname = $(this).parent().prev().text();
+                var name = $(this).parent().prev().prev().text();
+                var id = $(this).attr('data-id');
+                // 点击编辑按钮 让每个输入框都对应有文字
+                $('.sys-name').val(name);
+                $('.nickname').val(nickname);
+                $('.id').val(id);
+                // 让每一个编辑按钮变成颜色  文本变成编辑
+                $('#model_add').addClass('btn-success').text('编辑')
+                $('#addModal .modal-title').html('编辑分类名称');
+                $('#addModal').modal('show');
             })
 
+            // 让新增分类里面的按钮 恢复成原来的样子
+            $('.btn-add').click(function (e) {
+                e.preventDefault()
+                // 清空输入框分类名称
+                $('.sys-name').val('');
+                // 清空输入框分类别名
+                $('.nickname').val('');
+                $('#model_add').removeClass('btn-success').text('新增');
+                $('#addModal').modal('hide');
+                $('#addModal .modal-title').html('新增分类名称');
+            })
+
+            // 点击编辑按钮 发送请求
+            $('#model_add').click(function (e) {
+                e.preventDefault();
+                // 判断按钮是否有这个类  有就是编辑  没有就是新增
+                if ($(this).hasClass('btn-success')) {
+                    // 获取输入框里面的文本 然后发送请求
+                    var name = $('.sys-name').val();
+                    var nickname = $('.nickname').val();
+                    var id = $('.id').val();
+                    $.post({
+                        url: "http://localhost:8000/admin/category_edit",
+                        data: {
+                            id: id,
+                            name: name,
+                            slug: nickname
+                        },
+                        success: function (backData) {
+                            if (backData.code == 200) {
+                                // $('tbody').html(str)
+                                getArt();
+                                // console.log(backData);
+
+                            }
+                        }
+
+                    })
+
+                } else {
+                    // 给点击新增添加点击事件
+                    // e.preventDefault()
+                    // 获取分类名称的文本
+                    var sysName = $('.sys-name').val();
+                    // 获取分类别名的文本
+                    var nickname = $('.nickname').val();
+                    // 发送请求
+                    $.post({
+                        url: "http://localhost:8000/admin/category_add",
+                        data: {
+                            name: sysName,
+                            slug: nickname
+                        },
+                        success: function (backData) {
+                            if (backData.code == 200) {
+                                // var obj = {
+                                //     name: sysName,
+                                //     slug: nickname,
+                                // }
+                                // var str1 = template('tpl-2', obj);
+                                // $('tbody').append(str1);
+                                // // window.location.onload();
+                                getArt();
+                            }
+                        }
+                    });
+
+                }
+
+            });
+
+
             $('tbody').on('click', '.btn-del', function (e) {
-                var idcate = $('.btn-del').attr('data-id')
+                var idcate = $(this).attr('data-id')
                 var that = this;
                 e.preventDefault();
                 if (confirm('你是否要删除')) {
@@ -214,7 +274,6 @@
                             id: idcate
                         },
                         success: function (backData) {
-                            console.log(backData);
                             if (backData.code == 200) {
                                 $(that).parent().parent().remove();
                             }

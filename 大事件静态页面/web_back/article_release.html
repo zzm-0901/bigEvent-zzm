@@ -28,14 +28,14 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" placeholder="文章标题">
+                        <input type="email" name="title" class="form-control" id="inputEmail3" placeholder="文章标题">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
                         <img src="../web_back/images/2.jpg" alt="" style="width:150px">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" name="cover" id="exampleInputFile">
                     </div>
                 </div>
                 <div class="form-group">
@@ -55,7 +55,7 @@
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="dateinput">
+                            <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD" id="dateinput">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
@@ -69,13 +69,13 @@
                     <div class="col-sm-10">
                         <textarea class="form-control" id="rich_content" name="content" placeholder="文章内容">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda fugiat illo nihil molestias ab. Laborum eius non atque, totam sapiente quae obcaecati assumenda ratione inventore pariatur maiores, qui libero delectus.
-                            </textarea>
+                        </textarea>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">发布</button>
-                        <button type="submit" class="btn btn-default">存为草稿</button>
+                        <button type="submit" class="btn btn-success publish">发布</button>
+                        <button type="submit" class="btn btn-default draft">存为草稿</button>
                     </div>
                 </div>
             </form>
@@ -102,12 +102,30 @@
                     $('.form-control').html(res)
                 }
             })
-
+            // 一进来页面 显示本地时间
+            // 获取时间戳 
             var timeStmep = Date.parse(new Date());
+            // 将时间戳转的日期格式化 moment方法需要导入js文件
             var str = moment(timeStmep).format('YYYY-MM-DD');
             $('#dateinput').val(str);
 
-            
+            // 点击发布按钮 发送ajax请求
+            $('.publish').click(function () {
+                var fm = new FormData($('.article_form')[0]);
+                fm.append('state', '草稿');
+                fm.append('content', tinyMCE.activeEditor.getContent())
+                $.post({
+                    url: 'http://localhost:8000/admin/article_publish',
+                    data: fm,
+                    contentType: false,
+                    processData: false,
+                    success: function (backData) {
+                        if (backData.code == 201) {
+                            alert('发送成功')
+                        }
+                    }
+                })
+            })
         })
     </script>
 </body>

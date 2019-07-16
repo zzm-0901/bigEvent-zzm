@@ -15,6 +15,7 @@
     <script src="js/jedate/js/jedate.js"></script>
     <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
     <script src="js/tinymce/js/tinymce_setup.js"></script>
+    <script src="./js/moment.js"></script>
 </head>
 
 <body>
@@ -33,6 +34,7 @@
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
+                        <img src="../web_back/images/2.jpg" alt="" style="width:150px">
                         <input type="file" id="exampleInputFile">
                     </div>
                 </div>
@@ -79,7 +81,35 @@
             </form>
         </div>
     </div>
+    <script src="./js/template-web.js"></script>
+    <script id="tpl_type" type="text/html">
+        {{each data}}
+        <option value="{{$value.id}}">{{$value.name}}</option>
+        {{/each}}
+    </script>
+    <script>
+        $(function () {
+            $('#exampleInputFile').change(function () {
+                var url = URL.createObjectURL(this.files[0]);
+                $(this).prev().attr('src', url);
+            })
 
+            // 页面一进来就发送ajax请求 显示文章类别 
+            $.get({
+                url: "http://localhost:8000/admin/category_search",
+                success: function (backData) {
+                    var res = template('tpl_type', backData);
+                    $('.form-control').html(res)
+                }
+            })
+
+            var timeStmep = Date.parse(new Date());
+            var str = moment(timeStmep).format('YYYY-MM-DD');
+            $('#dateinput').val(str);
+
+            
+        })
+    </script>
 </body>
 
 </html>

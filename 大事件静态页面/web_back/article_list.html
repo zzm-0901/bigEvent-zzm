@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/jquery-1.12.4.min.js"></script>
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../按钮组/按钮组/jquery.twbsPagination.min.js"></script>
 </head>
 
 <body>
@@ -299,41 +301,80 @@
             window.parent.setMenu(1, 1);
         })
 
+        // 按钮组的方法
+        // 按钮组插件 
+        var myTotal = 20;//设置一个变量 用来存储页数
+        var $pagination = $('.pagination');
+        var defaultOpts = {
+            totalPages: myTotal,
+            visiblePages: 5,
+            first: "首页",
+            prev: "上一页",
+            next: "下一页",
+            last: "尾页",
+            onPageClick: function (event, page) {
+                // $('#page-content').text('Page ' + page);
+                getData(page)
+            }
+        };
+        $pagination.twbsPagination(defaultOpts);
         // 一进来页面 就获取并且刷新文章
-        function getData() {
+        function getData(mypage) {
             var type = $('#selCategory').val()
             var state = $('#selStatus').val()
+
             $.get({
                 url: "http://localhost:8000/admin/search",
                 data: {
-                    page: 1,
-                    perpage: 6,
+                    // 因为数据不能写死  所以我们的页数 用参数传入
+                    page: mypage,
+                    perpage: 5,
                     type: type,
                     state: state
                 },
                 success: function (backData) {
-                    var res = template('tpl', backData)           
-                    $('tbody').html(res)
+                    if (backData.code == 200) {
+                        var res = template('tpl', backData);
+                        $('tbody').html(res)
+                        var totalPages = backData.totalPage;
+                        // 筛选出来的页数 不等于 下载的页数 就开始渲染
+                        if (myTotal != backData.totalPage) {
+                            // 然后 筛选出来的页数赋值到我的页数 方便下一次判断
+                            myTotal = totalPages;
+                            var currentPage = $pagination.twbsPagination('getCurrentPage');
+                            $pagination.twbsPagination('destroy');
+                            $pagination.twbsPagination($.extend({}, defaultOpts, {
+                                startPage: 1,
+                                totalPages: totalPages
+                            }));
+                        }
+                    }
                 }
             })
         }
 
-        // 一进来页面 就获取刷新所有类型 与文章类型一致
+        // 一进来页面 就获取刷新所有类型 与文章类型一致 下拉菜单
         $.get({
             url: "http://localhost:8000/admin/category_search",
             success: function (backData) {
-                var name = template('tpl_sel', backData);
-                $('#selCategory').html(name);
+                if (backData.code == 200) {
+                    var name = template('tpl_sel', backData);
+                    $('#selCategory').html(name);
+                }
             }
-        })  
-        
+        })
+
         // 点击筛选
         $('#btnSearch').click(function (e) {
             e.preventDefault()
-            getData()
+            // 只要点击筛选 就跳到第一页
+            getData(1)
         })
 
+        // 一进来页面就调用筛选按钮
         $('#btnSearch').trigger('click');
+
+
     </script>
 
 </body>

@@ -289,8 +289,8 @@
             <td class="text-center">{{$value.date}}</td>
             <td class="text-center">{{$value.state}}</td>
             <td class="text-center">
-                <a href="post-edit.html?id=995" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:deleteTr( 995 );" class="btn btn-danger btn-xs">删除</a>
+                <a href="#" class="btn btn-default btn-xs">编辑</a>
+                <a href="#" data-id='{{$value.id}}' class="btn btn-danger btn-xs btn-delete">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -374,7 +374,27 @@
         // 一进来页面就调用筛选按钮
         $('#btnSearch').trigger('click');
 
-
+        // 添加点击删除时间
+        $('tbody').on('click', '.btn-delete', function (e) {
+            e.preventDefault();
+            var id = $(this).attr('data-id');
+            console.log(id);
+            var that = this;
+            $.get({
+                url: 'http://localhost:8000/admin/article_delete',
+                data: {
+                    id: id
+                },
+                success: function (backData) {
+                    if (backData.code == 200) {
+                        if (confirm('你确定要删除吗')) {
+                            $(that).parent().parent().remove();
+                            getData(1)
+                        }
+                    }
+                }
+            })
+        })
     </script>
 
 </body>

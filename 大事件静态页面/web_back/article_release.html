@@ -114,7 +114,8 @@
             $('#dateinput').val(str);
 
             // 点击发布按钮 发送ajax请求
-            $('.publish').click(function () {
+            $('.publish').click(function (e) {
+                e.preventDefault();
                 var fm = new FormData($('.article_form')[0]);
                 fm.append('state', '草稿');
                 fm.append('content', tinyMCE.activeEditor.getContent())

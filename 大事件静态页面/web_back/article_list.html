@@ -289,7 +289,7 @@
             <td class="text-center">{{$value.date}}</td>
             <td class="text-center">{{$value.state}}</td>
             <td class="text-center">
-                <a href="#" class="btn btn-default btn-xs">编辑</a>
+                <a href="post-edit.html?{{$value.id}}" class="btn btn-default btn-xs btn-edit">编辑</a>
                 <a href="#" data-id='{{$value.id}}' class="btn btn-danger btn-xs btn-delete">删除</a>
             </td>
         </tr>
@@ -337,11 +337,11 @@
                         var res = template('tpl', backData);
                         $('tbody').html(res)
                         var totalPages = backData.totalPage;
+                        window.currentPage = $pagination.twbsPagination('getCurrentPage');
                         // 筛选出来的页数 不等于 下载的页数 就开始渲染
                         if (myTotal != backData.totalPage) {
                             // 然后 筛选出来的页数赋值到我的页数 方便下一次判断
                             myTotal = totalPages;
-                            var currentPage = $pagination.twbsPagination('getCurrentPage');
                             $pagination.twbsPagination('destroy');
                             $pagination.twbsPagination($.extend({}, defaultOpts, {
                                 startPage: 1,
@@ -376,24 +376,26 @@
 
         // 添加点击删除时间
         $('tbody').on('click', '.btn-delete', function (e) {
-            e.preventDefault();
-            var id = $(this).attr('data-id');
-            console.log(id);
-            var that = this;
-            $.get({
-                url: 'http://localhost:8000/admin/article_delete',
-                data: {
-                    id: id
-                },
-                success: function (backData) {
-                    if (backData.code == 200) {
-                        if (confirm('你确定要删除吗')) {
-                            $(that).parent().parent().remove();
-                            getData(1)
+            if (confirm('你确定要删除吗')) {
+                e.preventDefault();
+                // 点击哪个 就获取哪个删除按钮的id
+                var id = $(this).attr('data-id');
+                var that = this;
+                $.get({
+                    url: 'http://localhost:8000/admin/article_delete',
+                    data: {
+                        id: id
+                    },
+                    success: function (backData) {
+                        if (backData.code == 200) {
+
+                            // $(that).parent().parent().remove();
+                            getData(currentPage)
+
                         }
                     }
-                }
-            })
+                })
+            }
         })
     </script>
 

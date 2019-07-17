@@ -25,22 +25,23 @@
         <div class="container-fluid common_con">
             <form class="form-horizontal article_form">
                 <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
+                    <label for="inputEmail3" class="col-sm-2 control-label ">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" value="文章标题文字">
+                        <input type="text" name="title" class="form-control article_title" id="inputEmail3"
+                            value="文章标题文字">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
                         <img src="images/pic06.jpg" class="article_cover">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" name="cover" id="exampleInputFile">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select class="form-control article_type" name="type">
                             <option>类别一</option>
                             <option>类别二</option>
                             <option>类别三</option>
@@ -54,30 +55,98 @@
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" value="2019-05-17" id="dateinput">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"
+                            <input type="text" class="form-control" disabled value="2019-05-17" id="dateinput"
+                                name="date">
+                            <!-- <span class="input-group-btn"> -->
+                            <!-- <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
-                                        class="iconfont icon-icondate"></i></button>
-                            </span>
+                                        class="iconfont icon-icondate"></i></button> -->
+                            <!-- </span> -->
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="rich_content" name="content" placeholder="文章内容" value="文章内容">
+                        <input type="text" class="form-control" id="rich_content"  placeholder="文章内容"
+                            value="文章内容">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">修改</button>
+                        <button type="submit" class="btn btn-success btn-edit">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script src="./js/template-web.js"></script>
+    <script id="tpl" type="text/html">
+        {{each data}}
+        <option value="{{$value.id}}">{{$value.name}}</option>
+        {{/each}}
+    </script>
+    <script>
+        // 入口函数
+        $(function () {
+            // 获取点进来哪一个按钮 拿到那个按钮的id
+            var id = window.location.search.split('=')[1]
 
+            // 为file 文件添加 值改变事件
+            $('#exampleInputFile').change(function () {
+                var url = URL.createObjectURL(this.files[0])
+                $('.article_cover').attr('src', url)
+            })
+
+            // 一进来发送ajax请求  更新文章类别
+            $.get({
+                url: "http://localhost:8000/admin/category_search",
+                success: function (backData) {
+                    if (backData.code == 200) {
+                        var res = template('tpl', backData)
+                        $('.article_type').html(res)
+                    }
+                }
+            })
+            // 一进来发送ajax请求  即使更新数据
+            $.get({
+                url: "http://localhost:8000/admin/search",
+                data: {
+                    id: id
+                },
+                success: function (backData) {
+                    console.log(backData);
+                    if (backData.code == 200) {
+                        $('.article_title').val(backData.data.title)
+                        $('.article_cover').attr('src', backData.data.cover)
+                        $('#dateinput').val(backData.data.date)
+                        $('#rich_content').val(backData.data.content)
+                        $('.article_type').val(backData.data.type)
+                    }
+                }
+            })
+
+            // 点击修改按钮  发送ajax请求
+            // 用formData对象
+            $('.btn-edit').click(function (e) {
+                e.preventDefault();
+                var fm = new FormData($('.article_form')[0])            
+                fm.append('id',id)
+                fm.append('content', tinyMCE.activeEditor.getContent())
+                $.post({
+                    url: "http://localhost:8000/admin/article_edit",
+                    data: fm,
+                    contentType: false,
+                    processData: false,
+                    success: function (backData) {
+                        if (backData.code == 200) {
+                            alert('修改成功')
+                        }
+                    }
+                })
+            })
+        })
+    </script>
 </body>
 
 </html>
